@@ -1,0 +1,186 @@
+Grafx2 compilation and installation
+===================================
+
+=== Requirements ===
+
+* gcc C compiler (other compilers may work, but are not officially supported)
+* GNU make (other similar "make" tools may work, but are not supported)
+* SDL library v1.2
+* SDL_image library
+* libpng (not on MacOSX)
+* FreeType library (optional, for truetype fonts)
+* SDL_ttf library (optional, for truetype fonts)
+* Lua library v5.1 (optional, for Lua scripting)
+
+Extra requirements for Windows:
+* a POSIX environment: MSYS is fine, maybe Cygwin would work as well.
+* use Mingw C compiler instead of gcc
+
+Extra requirements for UNIX/X11 (Linux, FreeBSD, ...):
+* pkg-config (optional, for Lua scripting)
+* X11 headers (optional, for truetype fonts)
+
+On Debian-based distributions you should be able to get all these files by
+simply running the following command from a terminal :
+  sudo aptitude install gcc make libsdl1.2-dev libsdl-image1.2-dev libsdl-ttf2.0-dev libfreetype6-dev liblua5.1-0-dev lua5.1
+
+=== Instructions ===
+
+Open a shell/Terminal, enter the directory where you have the project tree, and
+type:
+  cd src
+  make
+If all goes well, it should build grafx2 (the main program) in the "bin"
+directory. Voilà.
+
+If you don't have FreeType and SDL_ttf, type make NOTTF=1 instead. It will
+build a version without TrueType support : the Text tool will be limited to
+bitmap fonts, proportional fonts with .ttf extension won't be available.
+
+If you don't have lua available, type `make NOLUA=1`. You will not be able to
+use lua scripts to generate and alter brush and pictures.
+
+These options can be combined, for example for a build without ttf nor lua type
+make NOTTF=1 NOLUA=1
+
+
+=== Build variants ===
+
+The default compilation is optimized ( -O ), with debugging symbols for GDB.
+Compile with OPTIM=0 to disable optimizations, if you have some real debugging
+to do.
+Compile with OPTIM=3 to use maximum optimizations.
+Type "make release" if you don't want the debugging symbols.
+
+Compile with USE_JOYSTICK=1 to enable joystick input : Only useful for
+developers, to check the input code for platforms that don't have a mouse.
+
+Compile with NOLAYERS=1 to make a version of Grafx2 that can't display 
+several layers at a time: You will still be able to edit layered images,
+but you will only see one layer at a time. This option is designed for slow
+platforms, as it makes the program faster.
+
+=== Other compilation targets ===
+  make clean
+Erases all generated files (intermediate objects, and executable)
+
+  make depend
+Re-compute the dependencies (makefile.dep).
+
+Other compilation targets (make version, make ziprelease) require Subversion
+and are only useful to contributors to the svn repository of Grafx2.
+
+=== System specifics ===
+
+== Unix/Linux ==
+
+  sudo make install
+This copies the executable and data files in your system, in the /usr/local/bin
+and /usr/local/share directories. You then no longer need the compilation
+directory.
+
+  sudo make uninstall
+Removes the copied files from your system, keeps your configuration.
+
+For both options, you can specify prefix=something to choose the target
+directory root: For example prefix=/usr or prefix=./test-install
+
+== gp2x ==
+
+The gp2x build is very similar to the Linux one. TTF is always disabled because 
+there is no X11 support on the gp2x.
+To compile a gp2x executable, type
+	make GP2XCROSS=1
+This will only work on an UNIXsystem (Linux or FreeBSD).
+
+== Windows ==
+
+It is also possible to compile from linux, with this command :
+	make WIN32CROSS=1
+You will need the mingw cross-compiler, and all the librairies listed above.
+
+Here is a list of the resources used to build the Windows version:
+
+4DOS
+  with an alias make=mingw32-make
+
+MSYS
+  installed in C:\MSYS
+
+Mingw
+  installed in C:\MSYS\mingw
+
+SDL:
+  SDL-devel-1.2.13-mingw32.tar.gz
+  Uncompress in temporary directory
+  make
+  make install (no effect?)
+  Headers are in /usr/mingw/include/SDL, copy them to /usr/include/SDL
+
+Zlib:
+  http://gnuwin32.sourceforge.net/downlinks/zlib.php
+  zlib-1.2.3.exe
+  Install in c:\msys\mingw
+  
+Libpng
+  Requires: Zlib
+  http://www.mirrorservice.org/sites/download.sourceforge.net/pub/sourceforge/l/li/libpng/
+  libpng-1.0.23.tar.gz
+  Uncompress in temporary directory
+  ./configure
+  make
+  make install (long)
+  Files created in /usr/local/include and /usr/local/lib ....
+  
+libjpeg (optional - improves SDL_image with JPEG reading)
+  http://www.mirrorservice.org/sites/download.sourceforge.net/pub/sourceforge/l/project/li/libjpeg/libjpeg/
+  jpegsr6.zip
+  Uncompress in temporary directory
+  ./configure --enable-shared
+  make
+  (make install doesn't work. Copy jpeglib.h, jmorecfg.h, jconfig.h in include, and libjpeg.a in lib)
+  
+libtiff (optional - improves SDL_image with TIFF reading)
+  ftp://ftp.sgi.com/graphics/tiff/
+  tiff-v3.4-tar.gz
+  Uncompress in temporary directory
+  ./configure i686-pc-mingw32
+  make
+  Don't use 'make install', copy tiff.h libtiff.a manually instead.
+  
+SDL_image:
+  Requires: Libpng
+  Requires optionally: libtiff
+  Requires optionally: libjpeg
+  http://www.mirrorservice.org/sites/download.sourceforge.net/pub/sourceforge/l/li/libsdl/
+  SDL_image-1.2.8.zip
+  Uncompress in temporary directory
+  ./configure
+  Check in the messages that png worked
+  Optionally check if jpeg worked too
+  Optionally check if tiff worked too
+  make
+  make install prefix=/usr/mingw
+  
+FreeType:
+  http://www.mirrorservice.org/sites/download.sourceforge.net/pub/sourceforge/m/mi/mingw-cross/
+  mingw-freetype-2.3.7-2
+  Uncompress in c:/mwsys/mingw
+  
+SDL_ttf:
+  No mingw package
+  http://www.mirrorservice.org/sites/download.sourceforge.net/pub/sourceforge/l/li/libsdl/
+  SDL_ttf-2.0.9-win32.zip for DLLs: libfreetype-6.dll, SDL_ttf.dll, zlib1.dll
+  SDL_ttf-2.0.9.tar.gz
+
+Lua:
+  (optional)
+  http://www.lua.org/ftp/lua-5.1.4.tar.gz
+  Uncompress in temporary directory
+  Use sh shell
+  make mingw
+  (make install doesn't work, even with prefix)
+  Copy luaconf.h, lualib.h, lua.h, lauxlib.h to c:\msys\mingw\include
+  Copy liblua.a to c:\msys\mingw\lib
+  Copy lua51.dll to c:\msys\mingw\bin
+
