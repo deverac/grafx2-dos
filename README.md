@@ -29,6 +29,10 @@ if they are pressed or not pressed.
 Reassigning keys is only needed if you plan to use a keyboard shortcut and the
 keyboard shortcut is one that is not available in DOS.
 
+Grafx2 can run under DOSBox, provided CWSDPMI.EXE is available. There are
+several ways of running CWSDPMI; the easiest is probably just to copy the
+CWSDPMI.EXE executable to the same directory that GRAFX2.EXE resides in.
+
 ### Bugs
 
 This is an alpha-release. There are probably many bugs.
@@ -41,8 +45,9 @@ over it. This is a difficult issue to fix.
 Moving Left causes the mouse to move two pixels. If the cursor is on an odd
 x-value, moving Up or Down will also cause the x position to decrease by one.
 
-* The mouse will sometimes make small erratic movements. This may be a bug
-with the mouse driver or the emulation code.
+* In FreeDOS, the mouse will sometimes make small erratic movements. This is
+probably due to a bug with the mouse driver. No such movements occur when
+running in DOSBox.
 
 * TrueType Fonts are not supported.
 
@@ -50,7 +55,7 @@ with the mouse driver or the emulation code.
 e.g. Converting an image to RGB format is not supported. The useless scripts
 are included only for illustrative purposes.
 
-* Grafx2 does not work in DOSBox or DOSBox-X.
+* Grafx2 does not work in DOSBox-X.
 
 * Multi-byte characters in the names of contributors had to be replaced with
 similar single-byte ASCII characters to avoid over-running buffers and crashing
