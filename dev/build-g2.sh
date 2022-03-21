@@ -23,11 +23,9 @@ mkdir g2
 
 cd g2
 
-    tar -xzf ../support/grafx2-2.2.1404-src.tgz
-    rm -rf ./grafx2/misc
-    rm -rf ./grafx2/share/icons
-    rm -rf ./grafx2/share/grafx2/gfx2.gif
-    
+    cp -r ../../dos ./grafx2
+
+
     # Rename lua scripts to have unique names on an 8.3 file system.
     cd ./grafx2/share/grafx2/scripts
         mod_prefix  bru_db_  bd_
@@ -169,9 +167,6 @@ cd g2
     rm -f ./zlib/zlib2ansi
 
  
-    # Patch Grafx2 source files to allow it to run in FreeDOS.
-    patch -p0 < ../support/gfx2-dos.patch
-
 
     # Copy shim.c and shim.h (which the patch creates) to the libpng dir
     # and modify the Makefile appropriately to compile the example program.
@@ -183,3 +178,5 @@ cd g2
 cd ..
 
 7z a g2.zip g2
+
+rm -rf g2
