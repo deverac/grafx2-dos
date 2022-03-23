@@ -50,9 +50,15 @@ goto end
 
 
 :grafx2
-    rem 'mkdirs' and/or 'qecho' may be needed.
-    PATH=%CD%\util;%PATH%
+    rem 'which' does not return a useful exit code, but on success returns the absolute path
+    rem containing a semi-colon charater, so we use 'find' to set the exit code. 
+    rem If 'qecho' is found, assume 'mkdirs' will also be available.
+    which qecho | find ":" > NUL
+    if not errorlevel 1 goto g2cont
 
+    rem Add 'mkdirs' and 'qecho' to PATH.
+    PATH=%CD%\util;%PATH%
+:g2cont
 
     rem Build utilities.
     echo.
