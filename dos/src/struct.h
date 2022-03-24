@@ -485,4 +485,19 @@ typedef enum {
   MENUBAR_COUNT
 } T_Menubars;
 
+#if defined(FDOS)
+  // Defined here because this file is included in both main.c (which parses
+  // the command-line) and op_c.c (where it is used).
+  //
+  // The color-space of a 24-bit image must be reduced to 256 colors. The color
+  // mapping process can be performed at various bit-depths. Assuming an 'int*'
+  // is 4 bytes, the maximum bit-depth for the [R,G,B] components is [8,8,8],
+  // which requires 256^3*4 = 64Mb. FreeDOS, apparently, cannot allocate this
+  // much memory (the malloc() call hangs) so a smaller bit-depth must be used.
+  // A bit-depth of [6,6,6] requires 64^3*4 = 1,048,576 = 1Mb, which FreeDOS is
+  // able to allocate. The minimum bit-depth [3,3,2] requires 8*8*4*4 = 1Kb.
+  extern int PALETTE_PRECISION; // The RGB-triplet of 'precision_24b[]' to use
+                                // for color-mapping. Multiply by 3 to get the
+                                // actual array index.
+#endif
 #endif

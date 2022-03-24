@@ -78,6 +78,11 @@
   extern DECLSPEC int SDLCALL SDL_putenv(const char *variable);
 #endif
 
+
+#if defined(FDOS)
+int PALETTE_PRECISION = 1; // Corresponds to RGB-triplet [6,6,6].
+#endif
+
 //--- Affichage de la syntaxe, et de la liste des modes vidéos disponibles ---
 void Display_syntax(void)
 {
@@ -90,6 +95,7 @@ void Display_syntax(void)
   printf("\t-rs-alt -rs-ctrl  reassign RightShift key as Alt or Ctrl key\n");
   printf("\t-cl-alt -cl-ctrl  reassign CapsLock key as Alt or Ctrl key\n");
   printf("\t-nl-alt -nl-ctrl  reassign NumLock key as Alt or Ctrl key\n");
+  printf("\t-pal-prec n       palette precision (0-11) when mapping an RGB image\n");
 #else
   printf("\t-wide             to emulate a video mode with wide pixels (2x1)\n");
   printf("\t-tall             to emulate a video mode with tall pixels (1x2)\n");
@@ -209,6 +215,7 @@ enum CMD_PARAMS
     CMDPARAM_CAPSLOCK_CTRL,
     CMDPARAM_NUMLOCK_ALT,
     CMDPARAM_NUMLOCK_CTRL,
+    CMDPARAM_PAL_PREC,
 #endif
     CMDPARAM_MODE,
     CMDPARAM_PIXELRATIO_TALL,
@@ -239,6 +246,7 @@ struct {
     {"cl-ctrl", CMDPARAM_CAPSLOCK_CTRL},
     {"nl-alt", CMDPARAM_NUMLOCK_ALT},
     {"nl-ctrl", CMDPARAM_NUMLOCK_CTRL},
+    {"pal-prec", CMDPARAM_PAL_PREC},
 #endif
     {"mode", CMDPARAM_MODE},
     {"tall", CMDPARAM_PIXELRATIO_TALL},
@@ -316,6 +324,19 @@ int Analyze_command_line(int argc, char * argv[], char *main_filename, char *mai
       case CMDPARAM_CAPSLOCK_CTRL:   set_fake_modifiers(FAKE_MOD_CL_CTRL); break;
       case CMDPARAM_NUMLOCK_ALT:     set_fake_modifiers(FAKE_MOD_NL_ALT ); break;
       case CMDPARAM_NUMLOCK_CTRL:    set_fake_modifiers(FAKE_MOD_NL_CTRL); break;
+      case CMDPARAM_PAL_PREC:
+        index++;
+        if (index < argc)  {
+          int pp = atoi(argv[index]);
+          if (pp >= 0 && pp <= 11) { // 11 is max index of 'precision_24b[]' triplets.
+            PALETTE_PRECISION = pp;
+            break;
+          }
+        }
+        Error(ERROR_COMMAND_LINE);
+        Display_syntax();
+        exit(0);
+        break;
 #endif
       case CMDPARAM_MODE:
         index++;

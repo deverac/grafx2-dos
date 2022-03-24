@@ -385,6 +385,87 @@ int OT_count_colors(T_Occurrence_table * t)
 // plane and the first pixel actually in a cluster
 
 
+#if defined(FDOS)
+// This is generalized code for packing a cluster. It will (should) work with
+// any combination of RGB-triplet values. The original code, from which this
+// was derived, is optimized for speed and can only handle the RGB-triplet
+// values of [8,8,8]; any other values would crash the program.
+
+/// Pack a cluster, ie compute its {r,v,b}{min,max} values
+void Cluster_pack(T_Cluster * c,T_Occurrence_table * to)
+{
+  int rmin,rmax,vmin,vmax,bmin,bmax;
+  int r,g,b;
+  int nbocc;
+
+  // Find min. and max. values actually used for each component in this cluster
+
+  rmin=c->rmax; rmax=c->rmin;
+  vmin=c->vmax; vmax=c->vmin;
+  bmin=c->bmax; bmax=c->bmin;
+  c->occurences=0;
+
+  for (r=c->rmin;r<=c->rmax;r++)
+    for (g=c->vmin;g<=c->vmax;g++)
+      for (b=c->bmin;b<=c->bmax;b++) {
+        nbocc=OT_get(to,r,g,b);
+        if (nbocc)
+        {
+          if (r<rmin) rmin=r;
+          else if (r>rmax) rmax=r;
+          if (g<vmin) vmin=g;
+          else if (g>vmax) vmax=g;
+          if (b<bmin) bmin=b;
+          else if (b>bmax) bmax=b;
+          c->occurences+=nbocc;
+        }
+      }
+
+  c->rmin=rmin; c->rmax=rmax;
+  c->vmin=vmin; c->vmax=vmax;
+  c->bmin=bmin; c->bmax=bmax;
+
+  // No need to sum c->occurences here (as is done in original, optimized code)
+  // because it is already summed in the for-loops above.
+
+  // Find the longest axis to know which way to split the cluster
+  // The magic values 299, 587, 144 represent the (integer) percentage that
+  // each RGB component contributes to the brightness of a color, as perceived
+  // by humans. They sum to 1000.
+  r=(c->rmax-c->rmin)*299;
+  g=(c->vmax-c->vmin)*587;
+  b=(c->bmax-c->bmin)*114;
+
+  if (g>=r)
+  {
+    // G>=R
+    if (g>=b)
+    {
+      // G>=R et G>=B
+      c->plus_large=1;
+    }
+    else
+    {
+      // G>=R et G<B
+      c->plus_large=2;
+    }
+  }
+  else
+  {
+    // R>G
+    if (r>=b)
+    {
+      // R>G et R>=B
+      c->plus_large=0;
+    }
+    else
+    {
+      // R>G et R<B
+      c->plus_large=2;
+    }
+  }
+}
+#else
 /// Pack a cluster, ie compute its {r,v,b}{min,max} values
 void Cluster_pack(T_Cluster * c,T_Occurrence_table * to)
 {
@@ -545,7 +626,138 @@ ENDCRUSH:
     }
   }
 }
+#endif
 
+
+#if defined(FDOS)
+// This is generalized code for splitting a cluster. It will (should) work with
+// any combination of RGB-triplet values. The original code, from which this
+// was derived, is optimized for speed and can only handle the RGB-triplet
+// values of [8,8,8]; any other values would crash the program.
+
+/// Split a cluster on its longest axis.
+/// c = source cluster, c1, c2 = output after split
+void Cluster_split(T_Cluster * c, T_Cluster * c1, T_Cluster * c2, int hue,
+  T_Occurrence_table * to)
+{
+  int limit;
+  int cumul;
+  int r, g, b;
+
+  // Split criterion: each of the cluster will have the same number of pixels
+  limit = c->occurences / 2;
+  cumul = 0;
+  if (hue == 0) // split on red
+  {
+    // Run over the cluster until we reach the requested number of pixels
+    for (r=c->rmin;r<=c->rmax;r++) {
+      for (g=c->vmin;g<=c->vmax;g++) {
+        for (b=c->bmin;b<=c->bmax;b++)
+        {
+          cumul+=OT_get(to,r,g,b);
+          if (cumul>=limit)
+            break;
+
+        }
+        if (cumul>=limit)
+          break;
+      }
+      if (cumul>=limit)
+        break;
+    }
+
+    // We tried to split on red, but found half of the pixels with r = rmin
+    // so we enforce some split to happen anyway, instead of creating an empty
+    // c2 and c1 == c
+    if (r==c->rmin)
+      r++;
+
+    c1->Rmin=c->Rmin; c1->Rmax=r-1;
+    c1->rmin=c->rmin; c1->rmax=r-1;
+    c1->Gmin=c->Gmin; c1->Vmax=c->Vmax;
+    c1->vmin=c->vmin; c1->vmax=c->vmax;
+    c1->Bmin=c->Bmin; c1->Bmax=c->Bmax;
+    c1->bmin=c->bmin; c1->bmax=c->bmax;
+
+    c2->Rmin=r;       c2->Rmax=c->Rmax;
+    c2->rmin=r;       c2->rmax=c->rmax;
+    c2->Gmin=c->Gmin; c2->Vmax=c->Vmax;
+    c2->vmin=c->vmin; c2->vmax=c->vmax;
+    c2->Bmin=c->Bmin; c2->Bmax=c->Bmax;
+    c2->bmin=c->bmin; c2->bmax=c->bmax;
+  }
+  else
+  if (hue==1) // split on green
+  {
+    for (g=c->vmin;g<=c->vmax;g++) {
+      for (r=c->rmin;r<=c->rmax;r++) {
+        for (b=c->bmin;b<=c->bmax;b++)
+        {
+          cumul+=OT_get(to,r,g,b);
+            if (cumul>=limit)
+              break;
+        }
+        if (cumul>=limit)
+          break;
+      }
+      if (cumul>=limit)
+        break;
+    }
+
+    if (g==c->vmin)
+      g++;
+
+    c1->Rmin=c->Rmin; c1->Rmax=c->Rmax;
+    c1->rmin=c->rmin; c1->rmax=c->rmax;
+    c1->Gmin=c->Gmin; c1->Vmax=g-1;
+    c1->vmin=c->vmin; c1->vmax=g-1;
+    c1->Bmin=c->Bmin; c1->Bmax=c->Bmax;
+    c1->bmin=c->bmin; c1->bmax=c->bmax;
+
+    c2->Rmin=c->Rmin; c2->Rmax=c->Rmax;
+    c2->rmin=c->rmin; c2->rmax=c->rmax;
+    c2->Gmin=g;       c2->Vmax=c->Vmax;
+    c2->vmin=g;       c2->vmax=c->vmax;
+    c2->Bmin=c->Bmin; c2->Bmax=c->Bmax;
+    c2->bmin=c->bmin; c2->bmax=c->bmax;
+  }
+  else // split on blue
+  {
+    for (b=c->bmin;b<=c->bmax;b++)
+      for (g=c->vmin;g<=c->vmax;g++) {
+        for (r=c->rmin;r<=c->rmax;r++) {
+        {
+          cumul+=OT_get(to,r,g,b);
+          if (cumul>=limit)
+            break;
+
+        }
+        if (cumul>=limit)
+          break;
+      }
+      if (cumul>=limit)
+        break;
+    }
+
+    if (b==c->bmin)
+      b++;
+
+    c1->Rmin=c->Rmin; c1->Rmax=c->Rmax;
+    c1->rmin=c->rmin; c1->rmax=c->rmax;
+    c1->Gmin=c->Gmin; c1->Vmax=c->Vmax;
+    c1->vmin=c->vmin; c1->vmax=c->vmax;
+    c1->Bmin=c->Bmin; c1->Bmax=b-1;
+    c1->bmin=c->bmin; c1->bmax=b-1;
+
+    c2->Rmin=c->Rmin; c2->Rmax=c->Rmax;
+    c2->rmin=c->rmin; c2->rmax=c->rmax;
+    c2->Gmin=c->Gmin; c2->Vmax=c->Vmax;
+    c2->vmin=c->vmin; c2->vmax=c->vmax;
+    c2->Bmin=b;       c2->Bmax=c->Bmax;
+    c2->bmin=b;       c2->bmax=c->bmax;
+  }
+}
+#else
 
 /// Split a cluster on its longest axis.
 /// c = source cluster, c1, c2 = output after split
@@ -682,6 +894,7 @@ void Cluster_split(T_Cluster * c, T_Cluster * c1, T_Cluster * c2, int hue,
     c2->bmin=b;       c2->bmax=c->bmax;
   }
 }
+#endif
 
 
 /// Compute the mean R, G, B (for palette generation) and H, L (for palette sorting)
@@ -707,6 +920,11 @@ void Cluster_compute_hue(T_Cluster * c,T_Occurrence_table * to)
         }
       }
   
+#if defined(FDOS)
+  if (c->occurences == 0) {
+      c->occurences = 1; // Avoid division by zero.
+  }
+#endif
   c->r=(cumul_r<<to->red_r)/c->occurences;
   c->g=(cumul_g<<to->red_g)/c->occurences;
   c->b=(cumul_b<<to->red_b)/c->occurences;
@@ -821,6 +1039,10 @@ void CS_Get(T_Cluster_set * cs, T_Cluster * c)
     
   } while((current = current -> next));
 
+  if (current == NULL) {
+    return;
+  }
+
   // copy it to c
   *c = *current;
 
@@ -881,7 +1103,6 @@ void CS_Generate(T_Cluster_set * cs, T_Occurrence_table * to)
   {
     // Get the biggest one
     CS_Get(cs,&current);
-
     // Split it
     Cluster_split(&current, &Nouveau1, &Nouveau2, current.plus_large, to);
 
@@ -1342,13 +1563,18 @@ static const byte precision_24b[]=
 // Give this one a 24b source, get back the 256c bitmap and its palette
 int Convert_24b_bitmap_to_256(T_Bitmap256 dest,T_Bitmap24B source,int width,int height,T_Components * palette)
 {
-  T_Conversion_table * table; // table de conversion
+  T_Conversion_table * table = 0; // table de conversion
   int                ip;    // index de précision pour la conversion
 
   // On essaye d'obtenir une table de conversion qui loge en mémoire, avec la
   // meilleure précision possible
-  for (ip=0;ip<(10*3);ip+=3)
+  for (ip=0;ip<(int)sizeof(precision_24b);ip+=3)
   {
+#if defined(FDOS)
+    if (ip/3 < PALETTE_PRECISION) {
+        continue;
+    }
+#endif
     table=Optimize_palette(source,width*height,palette,precision_24b[ip+0],
                             precision_24b[ip+1],precision_24b[ip+2]);
     if (table!=0)
