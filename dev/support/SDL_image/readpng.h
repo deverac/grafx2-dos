@@ -16,7 +16,7 @@ typedef struct {
 
 void free_pngdat(pngdat * pdat);
 
-int read_png_file(char* file_name, pngdat * dat);
+int read_png_file(const char* file_name, pngdat * dat);
 
 void read_png_version_info();
 

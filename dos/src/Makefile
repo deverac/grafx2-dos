@@ -50,6 +50,17 @@ BIN = $(BINDIR)/grafx2.exe
 #### Mandatory for building for FreeDOS
 DOSCOPT = -DFDOS
 
+#### Enable SDL
+SDLCOPT = -I../../SDL/include
+SDLLINC = -L../../SDL
+SDLLOPT = -lsdl
+
+
+#### Enable SDL_image
+SDLIMGCOPT = -I../../SDL_image
+SDLIMGLINC = -L../../SDL_image
+SDLIMGLOPT = -lsdl_image
+
 
 #### Enable/Disable Joystick support (Joystick is not supported)
 #JOYCOPT = -DUSE_JOYSTICK
@@ -78,16 +89,17 @@ TTFCOPT = -DNOTTF
 #TTFCOPT =
 
 
-COPT = -W -Wall -Wdeclaration-after-statement -O -g -ggdb -I. $(DOSCOPT) $(JOYCOPT) $(LAYERCOPT) $(LUACOPT) $(PNGCOPT) $(TTFCOPT)
+COPT = -W -Wall -Wdeclaration-after-statement -O -g -ggdb -I. $(DOSCOPT) $(JOYCOPT) $(LAYERCOPT) $(LUACOPT) $(PNGCOPT) $(TTFCOPT) $(SDLCOPT) $(SDLIMGCOPT)
 
-LOPT = $(LUALINC) $(PNGLINC) $(LUALOPT) $(PNGLOPT) $(TTFLOPT) 
+LOPT = $(SDLLINC) $(LUALINC) $(PNGLINC) $(SDLIMGLINC)  $(SDLLOPT) $(LUALOPT) $(PNGLOPT) $(TTFLOPT) $(SDLIMGLOPT)
 
 
+OBJ = $(OBJDIR)/main.o $(OBJDIR)/init.o $(OBJDIR)/graph.o $(OBJDIR)/sdlscreen.o  $(OBJDIR)/misc.o $(OBJDIR)/special.o $(OBJDIR)/buttons.o $(OBJDIR)/palette.o $(OBJDIR)/help.o $(OBJDIR)/operatio.o $(OBJDIR)/pages.o $(OBJDIR)/loadsave.o $(OBJDIR)/readline.o $(OBJDIR)/engine.o $(OBJDIR)/filesel.o $(OBJDIR)/op_c.o $(OBJDIR)/readini.o $(OBJDIR)/saveini.o $(OBJDIR)/shade.o $(OBJDIR)/keyboard.o $(OBJDIR)/io.o $(OBJDIR)/version.o $(OBJDIR)/text.o $(OBJDIR)/SFont.o $(OBJDIR)/setup.o $(OBJDIR)/pxsimple.o $(OBJDIR)/pxtall.o $(OBJDIR)/pxwide.o $(OBJDIR)/pxdouble.o $(OBJDIR)/pxtriple.o $(OBJDIR)/pxtall2.o $(OBJDIR)/pxwide2.o $(OBJDIR)/pxquad.o $(OBJDIR)/windows.o $(OBJDIR)/brush.o $(OBJDIR)/realpath.o $(OBJDIR)/mountlist.o $(OBJDIR)/input.o $(OBJDIR)/hotkeys.o $(OBJDIR)/transform.o $(OBJDIR)/pversion.o $(OBJDIR)/factory.o $(OBJDIR)/fileformats.o $(OBJDIR)/miscfileformats.o $(OBJDIR)/libraw2crtc.o $(OBJDIR)/brush_ops.o $(OBJDIR)/buttons_effects.o $(OBJDIR)/layers.o $(OBJDIR)/shim.o
 
 
 .PHONY : all debug release clean version
 
-OBJ = $(OBJDIR)/main.o $(OBJDIR)/init.o $(OBJDIR)/graph.o $(OBJDIR)/sdlscreen.o  $(OBJDIR)/misc.o $(OBJDIR)/special.o $(OBJDIR)/buttons.o $(OBJDIR)/palette.o $(OBJDIR)/help.o $(OBJDIR)/operatio.o $(OBJDIR)/pages.o $(OBJDIR)/loadsave.o $(OBJDIR)/readline.o $(OBJDIR)/engine.o $(OBJDIR)/filesel.o $(OBJDIR)/op_c.o $(OBJDIR)/readini.o $(OBJDIR)/saveini.o $(OBJDIR)/shade.o $(OBJDIR)/keyboard.o $(OBJDIR)/io.o $(OBJDIR)/version.o $(OBJDIR)/text.o $(OBJDIR)/SFont.o $(OBJDIR)/setup.o $(OBJDIR)/pxsimple.o $(OBJDIR)/pxtall.o $(OBJDIR)/pxwide.o $(OBJDIR)/pxdouble.o $(OBJDIR)/pxtriple.o $(OBJDIR)/pxtall2.o $(OBJDIR)/pxwide2.o $(OBJDIR)/pxquad.o $(OBJDIR)/windows.o $(OBJDIR)/brush.o $(OBJDIR)/realpath.o $(OBJDIR)/mountlist.o $(OBJDIR)/input.o $(OBJDIR)/hotkeys.o $(OBJDIR)/transform.o $(OBJDIR)/pversion.o $(OBJDIR)/factory.o $(OBJDIR)/fileformats.o $(OBJDIR)/miscfileformats.o $(OBJDIR)/libraw2crtc.o $(OBJDIR)/brush_ops.o $(OBJDIR)/buttons_effects.o $(OBJDIR)/layers.o $(OBJDIR)/shim.o  $(OBJDIR)/SDL.o $(OBJDIR)/readpng.o
+
 
 all : $(BIN)
 

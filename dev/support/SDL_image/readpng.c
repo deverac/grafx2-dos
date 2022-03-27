@@ -17,7 +17,7 @@ void errmsg(const char * s, ...)
 }
 
 
-int read_png_file(char* file_name, pngdat * pdat)
+int read_png_file(const char* file_name, pngdat * pdat)
 {
     int x, y;
     int i, n;

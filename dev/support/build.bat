@@ -17,12 +17,23 @@ goto end
 :clean
     rem Clean
 
-    echo    Cleaning Grafx2
-    cd grafx2
-        cd src
-            make clean
-        cd ..
+    echo    Cleaning Util
+    cd util
+        make clean
     cd ..
+
+
+    echo    Cleaning LIBZ
+    cd zlib
+        make clean
+    cd ..
+
+
+    echo    Cleaning LIBPNG
+    cd libpng12
+        make clean
+    cd ..
+
 
     echo    Cleaning LIBLUA
     cd lua515
@@ -31,19 +42,24 @@ goto end
         cd ..
     cd ..
 
-    echo    Cleaning LIBPNG
-    cd libpng12
+
+    echo    Cleaning SDL
+    cd SDL
         make clean
     cd ..
 
-    echo    Cleaning LIBZ
-    cd zlib
+
+    echo    Cleaning SDL_image
+    cd SDL_image
         make clean
     cd ..
 
-    echo    Cleaning Util
-    cd util
-        make clean
+
+    echo    Cleaning Grafx2
+    cd grafx2
+        cd src
+            make clean
+        cd ..
     cd ..
 
     goto end
@@ -69,7 +85,7 @@ goto end
     cd ..
 
 
-    rem Build ZLIB library
+    rem Build LIBZ library
     echo.
     echo    Building LIBZ
     echo.
@@ -95,6 +111,24 @@ goto end
         cd src
             make liblua.a
         cd ..
+    cd ..
+
+
+    rem Build SDL.
+    echo.
+    echo    Building SDL
+    echo.
+    cd SDL
+        make libsdl.a
+    cd ..
+
+
+    rem Build SDL_image.
+    echo.
+    echo    Building SDL_image
+    echo.
+    cd SDL_image
+        make libsdl_image.a
     cd ..
 
 

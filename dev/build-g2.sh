@@ -71,8 +71,11 @@ cd g2
         mv sd_RemapImage2RGB_ed.lua   sd_2RGBe.lua
         mv sd_RemapImageTo3bitPal.lua sd_3bitP.lua
     cd ../../../..
-  
 
+
+    cp -r ../support/SDL ./SDL
+
+    cp -r ../support/SDL_image ./SDL_image
 
     tar -xzf ../support/libpng-1.2.59.tar.gz
     mv ./libpng-1.2.59 ./libpng12
