@@ -51,7 +51,7 @@ int main (int argc, char **argv) {
             str[-1] = '/';
         }
         if (stat (argv[1], &statBuf) == -1) {
-            mkdir (argv[1], 0);
+            mkdir (argv[1], S_IWUSR);
         } else {
             if (! S_ISDIR (statBuf.st_mode)) {
                 fprintf (stderr, "couldn't create directory %s\n", argv[1]);
