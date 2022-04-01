@@ -207,7 +207,7 @@ goto end
     echo Keywords:       freedos %NAM%>> %LSM%
     echo Author:         >> %LSM%
     echo Maintained-by:  >> %LSM%
-    echo Primary-site:   >> %LSM%
+    echo Primary-site:   https://github.com/deverac/grafx2-dos>> %LSM%
     echo Alternate-site: >> %LSM%
     echo Original-site:  >> %LSM%
     echo Platforms:      DOS>> %LSM%
@@ -229,7 +229,9 @@ goto end
 
     rem Copy 'source' files (also copies compiled files, if they exist).
     xcopy /E .\grafx2      %PKG%\source\%NAM%\grafx2\
+    xcopy /E .\libjpg6b    %PKG%\source\%NAM%\libjpg6b\
     xcopy /E .\libpng12    %PKG%\source\%NAM%\libpng12\
+    xcopy /E .\libtif36    %PKG%\source\%NAM%\libtif36\
     xcopy /E .\lua515      %PKG%\source\%NAM%\lua515\
     xcopy /E .\sdl         %PKG%\source\%NAM%\sdl\
     xcopy /E .\sdl_imag    %PKG%\source\%NAM%\sdl_imag\
@@ -245,11 +247,27 @@ goto end
     if exist %PKG%\source\%NAM%\grafx2\bin\NUL   deltree /y %PKG%\source\%NAM%\grafx2\bin
     if exist %PKG%\source\%NAM%\grafx2\obj\NUL   deltree /y %PKG%\source\%NAM%\grafx2\obj
 
+    if exist %PKG%\source\%NAM%\libjpg6b\libjpeg.a  del %PKG%\source\%NAM%\libjpg6b\libjpeg.a
+    del %PKG%\source\%NAM%\libjpg6b\*.o
+
     if exist %PKG%\source\%NAM%\libpng12\libpng.a  del %PKG%\source\%NAM%\libpng12\libpng.a
     del %PKG%\source\%NAM%\libpng12\*.o
 
+    if exist %PKG%\source\%NAM%\libtif36\libtiff\libtiff.a      del %PKG%\source\%NAM%\libtif36\libtiff\libtiff.a
+    if exist %PKG%\source\%NAM%\libtif36\libtiff\mkg3stat       del %PKG%\source\%NAM%\libtif36\libtiff\mkg3stat
+    if exist %PKG%\source\%NAM%\libtif36\libtiff\mkg3stat.exe   del %PKG%\source\%NAM%\libtif36\libtiff\mkg3stat.exe
+    if exist %PKG%\source\%NAM%\libtif36\libtiff\mkversion      del %PKG%\source\%NAM%\libtif36\libtiff\mkversion
+    if exist %PKG%\source\%NAM%\libtif36\libtiff\mkversion.exe  del %PKG%\source\%NAM%\libtif36\libtiff\mkversion.exe
+    del %PKG%\source\%NAM%\libtif36\libtiff\*.o
+
     if exist %PKG%\source\%NAM%\lua515\src\liblua.a  del %PKG%\source\%NAM%\lua515\src\liblua.a
     del %PKG%\source\%NAM%\lua515\src\*.o
+
+    if exist %PKG%\source\%NAM%\sdl\obj\NUL   deltree /y %PKG%\source\%NAM%\sdl\obj
+    if exist %PKG%\source\%NAM%\sdl\libsdl.a  del %PKG%\source\%NAM%\sdl\libsdl.a
+
+    if exist %PKG%\source\%NAM%\sdl_image\obj\NUL         deltree /y %PKG%\source\%NAM%\sdl_image\obj
+    if exist %PKG%\source\%NAM%\sdl_image\libsdl_image.a  del %PKG%\source\%NAM%\sdl_image\libsdl_image.a
 
     del %PKG%\source\%NAM%\util\*.exe
 
