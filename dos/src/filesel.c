@@ -1664,7 +1664,17 @@ byte Button_Load_or_Save(byte load, T_IO_Context *context)
           Highlight_file(previous_directory);
         }
         else
+        {
+#if defined(FDOS)
+          // A length of 3 means we are at the drive root (e.g. 'C:/').
+          // Note that this does not allow changing drives.
+          if (SDL_strlen(Main_current_directory) != 3) {
+              Error(0);
+          }
+#else
           Error(0);
+#endif
+        }
         // Affichage des premiers fichiers visibles:
         Prepare_and_display_filelist(Main_fileselector_position,Main_fileselector_offset,file_scroller);
         Display_cursor();
