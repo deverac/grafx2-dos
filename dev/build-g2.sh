@@ -24,6 +24,7 @@ mkdir g2
 cd g2
 
     cp -r ../../dos ./grafx2
+    rm ./grafx2/src/gfx2.ico
 
 
     # Rename lua scripts to have unique names on an 8.3 file system.
@@ -133,10 +134,26 @@ cd g2
         rm -f testimg.bmp
 
         rm -f config.guess
+        rm -f config.sub
         rm -f configure
         rm -f install-sh
         rm -f ltconfig
         rm -f ltmain.sh
+
+        rm -f testimg.ppm
+
+        rm -f makcjpeg.st
+        rm -f makdjpeg.st
+        rm -f makeapps.ds
+        rm -f makelib.ds
+        rm -f makeproj.mac
+        rm -f makljpeg.st
+        rm -f maktjpeg.st
+        rm -f makvms.opt
+
+        rm -f filelist.doc
+        rm -f change.log
+        rm -f jmemdosa.asm
     cd ..
 
 
