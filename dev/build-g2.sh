@@ -77,6 +77,69 @@ cd g2
 
     cp -r ../support/SDL_image ./SDL_image
 
+
+    tar -xzf ../support/jpegsrc.v6b.tar.gz
+    mv jpeg-6b libjpg6b
+    cd ./libjpg6b
+        mv jconfig.dj jconfig.h
+        mv makefile.dj Makefile
+
+        rm -f jconfig.bcc
+        rm -f jconfig.cfg
+        rm -f jconfig.mac
+        rm -f jconfig.manx
+        rm -f jconfig.mc6
+        rm -f jconfig.sas
+        rm -f jconfig.st
+        rm -f jconfig.vc
+        rm -f jconfig.vms
+        rm -f jconfig.wat
+
+        rm -f testimg.jpg
+        rm -f testimgp.jpg
+        rm -f testorig.jpg
+        rm -f testprog.jpg
+
+        rm -f makefile.ansi
+        rm -f makefile.bcc
+        rm -f makefile.cfg
+        rm -f makefile.manx
+        rm -f makefile.mc6
+        rm -f makefile.mms
+        rm -f makefile.sas
+        rm -f makefile.unix
+        rm -f makefile.vc
+        rm -f makefile.vms
+        rm -f makefile.wat
+
+        rm -f coderules.doc
+        rm -f install.doc
+        # Needed    rm -f jconfig.doc
+        rm -f libjpeg.doc
+        rm -f structure.doc
+        rm -f usage.doc
+        rm -f wizard.doc
+
+        rm -f ansi2knr.1
+        rm -f cjpeg.1
+        rm -f djpeg.1
+        rm -f jpegtran.1
+        rm -f rdjpgcom.1
+        rm -f wrjpgcom.1
+
+        rm -f README
+
+        rm -f testing.ppm
+        rm -f testimg.bmp
+
+        rm -f config.guess
+        rm -f configure
+        rm -f install-sh
+        rm -f ltconfig
+        rm -f ltmain.sh
+    cd ..
+
+
     tar -xzf ../support/libpng-1.2.59.tar.gz
     mv ./libpng-1.2.59 ./libpng12
     cp ./libpng12/scripts/makefile.dj2 ./libpng12/Makefile
@@ -120,6 +183,50 @@ cd g2
     rm -f ./libpng12/TODO
     rm -f ./libpng12/Y2KINFO
 
+
+    tar -xzf ../support/tiff-v3.6.1.tar.gz
+    mv tiff-v3.6.1 libtif36
+    cd ./libtif36
+        # Copy configuration for DJGPP
+        mv ./contrib/dosdjgpp/port.h       ./libtiff/port.h
+        mv ./contrib/dosdjgpp/Makefile.lib ./libtiff/Makefile
+        # Update Makefile
+        #     Avoid error if file does not exist
+        sed -i -e 's/del tif_fx3s.c/if exist tif_fx3s.c del tif_fx3s.c/' ./libtiff/Makefile
+        sed -i -e 's/del version.h/if exist version.h del version.h/' ./libtiff/Makefile
+        #     Use RELEASE-DATE instead of tiff.alpha
+        sed -i -e 's/ ..\/dist\/tiff.alpha/ ..\/RELEASE-DATE/' ./libtiff/Makefile
+        #     Correct param to mkversion
+        sed -i -e 's/ -a \${ALPHA} / -r ${ALPHA} /' ./libtiff/Makefile
+        #     Add color.c
+        sed -i -e 's/tif_codec.c \\/tif_codec.c tif_color.c \\/' ./libtiff/Makefile
+        sed -i -e 's/tif_codec.o \\/tif_codec.o tif_color.o \\/' ./libtiff/Makefile
+        #     Add tif_color.o rule
+        sed -i -e 's/tif_compress.o:/tif_color.o: ${SRCDIR}\/tif_color.c\n\t${CC} -c ${CFLAGS} ${SRCDIR}\/tif_color.c\ntif_compress.o:/' ./libtiff/Makefile
+        # Mangle symbol to avoid source code.
+        sed -i -e 's/__GNUC__/__XXXGNUC__/' ./libtiff/tif_msdos.c
+
+        rm -rf ./contrib
+        rm -rf ./dist
+        rm -rf ./html
+        rm -rf ./man
+        rm -rf ./port
+        rm -rf ./tools
+
+        rm -f ./libtiff/Makefile.in
+        rm -f ./libtiff/Makefile.lcc
+        rm -f ./libtiff/makefile.vc
+        rm -f ./libtiff/libtiff.def
+
+        rm -f config.guess
+        rm -f config.site
+        rm -f config.sub
+        rm -f configure
+        rm -f Makefile.in
+        rm -f README
+        rm -f test_pics.sh
+        rm -f TODO
+    cd ..
 
 
     tar -xzf ../support/lua-5.1.5.tar.gz
