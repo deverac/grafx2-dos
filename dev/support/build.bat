@@ -43,6 +43,19 @@ goto end
     cd ..
 
 
+    echo    Cleaning LIBJPEG
+    cd libjpg6b
+        make clean
+    cd ..
+
+
+    echo    Cleaning LIBTIFF
+    cd libtif36
+        cd libtiff
+            make clean
+        cd ..
+    cd ..
+
     echo    Cleaning SDL
     cd SDL
         make clean
@@ -67,7 +80,7 @@ goto end
 
 :grafx2
     rem 'which' does not return a useful exit code, but on success returns the absolute path
-    rem containing a semi-colon charater, so we use 'find' to set the exit code. 
+    rem containing a semi-colon character, so we use 'find' to set the exit code. 
     rem If 'qecho' is found, assume 'mkdirs' will also be available.
     which qecho | find ":" > NUL
     if not errorlevel 1 goto g2cont
@@ -92,15 +105,17 @@ goto end
     cd zlib
         make libz.a
     cd ..
+    if not exist .\zlib\libz.a goto errbuild
 
 
-    rem Build LIBPNG library (depends on ZLIB)
+    rem Build LIBPNG library (depends on LIBZ)
     echo.
     echo    Building LIBPNG
     echo.
     cd libpng12
         make libpng.a
     cd ..
+    if not exist .\libpng12\libpng.a goto errbuild
 
 
     rem Build LUA library
@@ -112,6 +127,29 @@ goto end
             make liblua.a
         cd ..
     cd ..
+    if not exist .\lua515\src\liblua.a goto errbuild
+
+
+    rem Build JPEG library
+    echo.
+    echo    Building LIBJPEG
+    echo.
+    cd libjpg6b
+        make libjpeg.a
+    cd ..
+    if not exist .\libjpg6b\libjpeg.a goto errbuild
+
+
+    rem Build TIFF library
+    echo.
+    echo    Building LIBTIFF
+    echo.
+    cd libtif36
+        cd libtiff
+            make libtiff.a
+        cd ..
+    cd ..
+    if not exist .\libtif36\libtiff\libtiff.a goto errbuild
 
 
     rem Build SDL.
@@ -121,6 +159,7 @@ goto end
     cd SDL
         make libsdl.a
     cd ..
+    if not exist .\sdl\libsdl.a goto errbuild
 
 
     rem Build SDL_image.
@@ -130,6 +169,7 @@ goto end
     cd SDL_image
         make libsdl_image.a
     cd ..
+    if not exist .\sdl_image\libsdl_image.a goto errbuild
 
 
     rem Build Grafx2 application.
@@ -191,6 +231,8 @@ goto end
     xcopy /E .\grafx2      %PKG%\source\%NAM%\grafx2\
     xcopy /E .\libpng12    %PKG%\source\%NAM%\libpng12\
     xcopy /E .\lua515      %PKG%\source\%NAM%\lua515\
+    xcopy /E .\sdl         %PKG%\source\%NAM%\sdl\
+    xcopy /E .\sdl_imag    %PKG%\source\%NAM%\sdl_imag\
     xcopy /E .\util        %PKG%\source\%NAM%\util\
     xcopy /E .\zlib        %PKG%\source\%NAM%\zlib\
     copy     .\build.bat   %PKG%\source\%NAM%\

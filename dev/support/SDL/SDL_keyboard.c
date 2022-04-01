@@ -18,7 +18,7 @@
 
 
 
-static SDLMod JOYSTICK_MODIFIERS = 0;
+static SDLMod JOYSTICK_MODIFIERS = 0; // Not used
 
 static Uint32 FAKE_MODIFIERS = 0;
 
@@ -62,43 +62,17 @@ void set_fake_modifiers(Uint32 fake_mods) {
 }
 
 
-// e.g. SDL_EnableKeyRepeat(250, 32);
-void SDL_EnableKeyRepeat(int delay_ms, int interval_ms) {
-  union REGS regs;
-  int delay_val = 0;
-  int interval_val = 30;
 
-  if (delay_ms == 250) {
-    delay_val = 0;
-  }
-  if (interval_ms == 32) {
-    interval_val = 30;
-  }
-
-  regs.h.ah = 0x03;         // typematic function
-  regs.h.al = 0x05;         // set rate/delay
-  regs.h.bh = delay_val;    // 0=250, 1=500, 2=750, 3=1000 
-  regs.h.bl = interval_val; // 0=30, 0x1f=2
-  int86(VIDEO_INT, &regs, &regs);
-}
-
-
-void SDL_EnableUNICODE(int flag) {
-  (void)flag;
+void SDL_EnableUNICODE(int enable)
+{
+  (void)enable; // Silence 'unused parameter' compiler warning.
   // Ignored
 }
 
 
-
-// In Grafx2 SDL_SetModState() is only used to set modifier keys when using
-// a joystick. Since a Joysticks is not supported, this function is basically
-// useless and only exists to allow compiling to succeed.
-void SDL_SetModState(SDLMod mod) {
-  JOYSTICK_MODIFIERS = mod;
-}
-
 // Get the state of modifiers.
-SDLMod SDL_GetModState(void){
+SDLMod SDL_GetModState (void)
+{
     unsigned int mod_flags = 0;
     unsigned int mod = 0;
     union REGS regs;
@@ -188,4 +162,33 @@ SDLMod SDL_GetModState(void){
 
     // return mod | JOYSTICK_MODIFIERS;
     return mod;
+}
+
+
+// In Grafx2 SDL_SetModState() is only used to set modifier keys when using
+// a joystick. Since a Joysticks is not supported, this function is basically
+// useless and only exists to allow compiling to succeed.
+void SDL_SetModState(SDLMod mod) {
+  JOYSTICK_MODIFIERS = mod;
+}
+
+// e.g. SDL_EnableKeyRepeat(250, 32);
+void SDL_EnableKeyRepeat(int delay_ms, int interval_ms)
+{
+  union REGS regs;
+  int delay_val = 0;
+  int interval_val = 30;
+
+  if (delay_ms == 250) {
+    delay_val = 0;
+  }
+  if (interval_ms == 32) {
+    interval_val = 30;
+  }
+
+  regs.h.ah = 0x03;         // typematic function
+  regs.h.al = 0x05;         // set rate/delay
+  regs.h.bh = delay_val;    // 0=250, 1=500, 2=750, 3=1000
+  regs.h.bl = interval_val; // 0=30, 0x1f=2
+  int86(VIDEO_INT, &regs, &regs);
 }

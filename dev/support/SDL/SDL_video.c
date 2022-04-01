@@ -1,3 +1,6 @@
+
+/* The high-level video driver subsystem */
+
 #include <stdio.h>
 #include <string.h>      // memcpy
 #include <stdlib.h>      // malloc
@@ -29,34 +32,54 @@ extern SDL_Surface* malloc_surface(Uint32 flags, int width, int height, int bpp,
 
 
 
-// Convert format of 'surface' to one that is suitable for displaying.
-// When running on DOS, this simply returns a copy of 'surface'.
-SDL_Surface *SDL_DisplayFormat(SDL_Surface *surface) {
-    int i;
-    SDL_Surface * surf = NULL;
-    surf = malloc_surface(surface->flags, surface->w, surface->h, surface->format->BitsPerPixel, surface->format->Rmask, surface->format->Gmask, surface->format->Bmask, surface->format->Amask);
-    if (surf) {
-        // copy pixels
-        memcpy(surf->pixels, surface->pixels, surface->h * surface->w * surface->format->BytesPerPixel);
 
-        // copy palette
-        for (i=0; i<surface->format->palette->ncolors; i++) {
-            surf->format->palette->colors[i].r = surface->format->palette->colors[i].r;
-            surf->format->palette->colors[i].g = surface->format->palette->colors[i].g;
-            surf->format->palette->colors[i].b = surface->format->palette->colors[i].b;
-            surf->format->palette->colors[i].a = surface->format->palette->colors[i].a;
-        }
-    }
-    return surf;
+
+
+
+
+
+
+
+/*
+ * Return a pointer to an array of available screen dimensions for the
+ * given format, sorted largest to smallest.  Returns NULL if there are
+ * no dimensions available for a particular format, or (SDL_Rect **)-1
+ * if any dimension is okay for the given format.  If 'format' is NULL,
+ * the mode list will be for the format given by SDL_GetVideoInfo()->vfmt
+ */
+SDL_Rect ** SDL_ListModes (SDL_PixelFormat *format, Uint32 flags)
+{
+    (void)format;
+    (void) flags;
+
+    screen_rect.x = 0;
+    screen_rect.y = 0;
+    screen_rect.w = FDOS_SCREEN_WIDTH;
+    screen_rect.h = FDOS_SCREEN_HEIGHT;
+
+    screen_modes[0] = &screen_rect;
+    screen_modes[1] = NULL; // Terminate list.
+
+    return screen_modes;
+}
+
+int SDL_VideoModeOK (int width, int height, int bpp, Uint32 flags)
+{
+   if (width != FDOS_SCREEN_WIDTH) return 0;
+   if (height != FDOS_SCREEN_HEIGHT) return 0;
+   if (bpp != 8) return 0;  // 2^8 ==256
+   if (flags != SDL_FULLSCREEN) return 0;
+   return 1;
 }
 
 
 
 
-
-// Returns a surface of 320x200 with 8bpp, (regardless of 'width', 'height' or
-// 'bpp' parameters) or NULL on failure; The 'flags' value is mostly ignored.
-SDL_Surface *SDL_SetVideoMode(int width, int height, int bpp, Uint32 flags) {
+/*
+ * Set the requested video mode, allocating a shadow buffer if necessary.
+ */
+SDL_Surface * SDL_SetVideoMode (int width, int height, int bpp, Uint32 flags)
+{
    union REGS regs;
 
     if (width != FDOS_SCREEN_WIDTH) {
@@ -82,39 +105,35 @@ SDL_Surface *SDL_SetVideoMode(int width, int height, int bpp, Uint32 flags) {
     return malloc_surface(flags, FDOS_SCREEN_WIDTH, FDOS_SCREEN_HEIGHT, 8, 0, 0, 0, 0);
 }
 
+/* 
+ * Convert a surface into the video pixel format.
+ */
+SDL_Surface * SDL_DisplayFormat (SDL_Surface *surface)
+{
+    int i;
+    SDL_Surface * surf = NULL;
+    surf = malloc_surface(surface->flags, surface->w, surface->h, surface->format->BitsPerPixel, surface->format->Rmask, surface->format->Gmask, surface->format->Bmask, surface->format->Amask);
+    if (surf) {
+        // copy pixels
+        memcpy(surf->pixels, surface->pixels, surface->h * surface->w * surface->format->BytesPerPixel);
 
-// Return 1 on success, otherwise 0.
-int SDL_VideoModeOK(int width, int height, int bpp, Uint32 flags) {
-   if (width != FDOS_SCREEN_WIDTH) return 0;
-   if (height != FDOS_SCREEN_HEIGHT) return 0;
-   if (bpp != 8) return 0;  // 2^8 ==256
-   if (flags != SDL_FULLSCREEN) return 0;
-   return 1;
+        // copy palette
+        for (i=0; i<surface->format->palette->ncolors; i++) {
+            surf->format->palette->colors[i].r = surface->format->palette->colors[i].r;
+            surf->format->palette->colors[i].g = surface->format->palette->colors[i].g;
+            surf->format->palette->colors[i].b = surface->format->palette->colors[i].b;
+        }
+    }
+    return surf;
 }
 
-
-// Returns array of SDL_Rect
-SDL_Rect ** SDL_ListModes(SDL_PixelFormat *format, Uint32 flags) {
-    (void)format;
-    (void) flags;
-
-    screen_rect.x = 0;
-    screen_rect.y = 0;
-    screen_rect.w = FDOS_SCREEN_WIDTH;
-    screen_rect.h = FDOS_SCREEN_HEIGHT;
-
-    screen_modes[0] = &screen_rect;
-    screen_modes[1] = NULL; // Terminate list.
-
-    return screen_modes;
-}
-
-
-//If 'x', 'y', 'w' and 'h' are all 0, SDL_UpdateRect will update the entire screen.
-void SDL_UpdateRect(SDL_Surface *screen, Sint32 x, Sint32 y, Sint32 w, Sint32 h){
-    int xx;
-    int yy;
-    // char *VGA = (char *)0xA0000;
+/*
+ * Update a specific portion of the physical screen
+ */
+void SDL_UpdateRect(SDL_Surface *screen, Sint32 x, Sint32 y, Uint32 w, Uint32 h)
+{
+    Sint32 xx;
+    Sint32 yy;
     char *VGA = (char *)VGA_START_ADDR;
     char* px = (char*)(screen->pixels);
 
@@ -130,29 +149,20 @@ void SDL_UpdateRect(SDL_Surface *screen, Sint32 x, Sint32 y, Sint32 w, Sint32 h)
         VGA[yy*(screen->w)+xx] = px[yy*(screen->w)+xx];
       }
     }
-
 }
 
-
-void SDL_WM_SetIcon(SDL_Surface *icon, Uint8 *mask) {
-  (void)icon;
-  (void)mask;
-  // Ignored
-}
-
-void  SDL_WM_SetCaption(const char * s1, const char * s2) {
-  (void)s1;
-  (void)s2;
-  // Ignored
-}
-
-
-
-// VGA only uses the lower six bits of each color byte. Shifting the value of
-// the actual color value right by two bits will give approximately the same
-// color when displayed by VGA hardware.
-// Writing to the VGA_PALETTE_COLOR_PORT will automatically advance the index.
-int SDL_SetPalette(SDL_Surface *surface, int flags, SDL_Color *colors, int firstcolor, int ncolors) {
+/*
+ * Set the physical and/or logical colormap of a surface:
+ * Only the screen has a physical colormap. It determines what is actually
+ * sent to the display.
+ * The logical colormap is used to map blits to/from the surface.
+ * 'which' is one or both of SDL_LOGPAL, SDL_PHYSPAL
+ *
+ * Return nonzero if all colours were set as requested, or 0 otherwise.
+ */
+int SDL_SetPalette(SDL_Surface *screen, int which,
+		   SDL_Color *colors, int firstcolor, int ncolors)
+{
     int i;
 
     if (firstcolor < 0 || firstcolor >= 256) {
@@ -164,7 +174,11 @@ int SDL_SetPalette(SDL_Surface *surface, int flags, SDL_Color *colors, int first
         return -1;
     }
 
-    if (flags & SDL_PHYSPAL) {
+    if (which & SDL_PHYSPAL) {
+        // VGA only uses the lower six bits of each color byte. Shifting the value of
+        // the actual color value right by two bits will give approximately the same
+        // color when displayed by VGA hardware.
+        // Writing to the VGA_PALETTE_COLOR_PORT will automatically advance the index.
         if (ncolors == 1) {
             outp(VGA_PALETTE_INDEX_PORT, firstcolor); // Index palette to change
             outp(VGA_PALETTE_COLOR_PORT, colors[0].r >> 2);
@@ -181,23 +195,53 @@ int SDL_SetPalette(SDL_Surface *surface, int flags, SDL_Color *colors, int first
         }
     }
 
-    if (surface) {
+    if (screen) {
         if (ncolors == 1) {
-            surface->format->palette->colors[firstcolor].r = colors[0].r;
-            surface->format->palette->colors[firstcolor].g = colors[0].g;
-            surface->format->palette->colors[firstcolor].b = colors[0].b;
+            screen->format->palette->colors[firstcolor].r = colors[0].r;
+            screen->format->palette->colors[firstcolor].g = colors[0].g;
+            screen->format->palette->colors[firstcolor].b = colors[0].b;
         } else { // ncolors == 256
             for(i=0; i<256; i++)
             {
-                surface->format->palette->colors[i].r = colors[i].r;
-                surface->format->palette->colors[i].g = colors[i].g;
-                surface->format->palette->colors[i].b = colors[i].b;
+                screen->format->palette->colors[i].r = colors[i].r;
+                screen->format->palette->colors[i].g = colors[i].g;
+                screen->format->palette->colors[i].b = colors[i].b;
             }
         }
     }
 
     return 0;
 }
+
+int SDL_SetColors(SDL_Surface *screen, SDL_Color *colors, int firstcolor,
+		  int ncolors)
+{
+	return SDL_SetPalette(screen, SDL_LOGPAL | SDL_PHYSPAL,
+			      colors, firstcolor, ncolors);
+}
+
+
+/*
+ * Sets/Gets the title and icon text of the display window, if any.
+ */
+void  SDL_WM_SetCaption(const char * s1, const char * s2) {
+  (void)s1;
+  (void)s2;
+  // Ignored
+}
+
+/*
+ * Sets the window manager icon for the display window.
+ */
+void SDL_WM_SetIcon (SDL_Surface *icon, Uint8 *mask)
+{
+  (void)icon;
+  (void)mask;
+  // Ignored
+}
+
+
+
 
 // Performs a blit from the source surface to the destination surface.
 // Returns 0 if the blit is successful or a negative value on failure.
@@ -218,12 +262,16 @@ int SDL_BlitSurface(SDL_Surface* src, const SDL_Rect* src_rect, SDL_Surface* dst
         printf("Err: height not equal\n");
         return -1;
     }
-    if (src->format->BytesPerPixel != 1) {
-        printf("Err: src BytesPerPixel not 1 %d\n", src->format->BytesPerPixel);
-        return -1;
-    }
-    if (dst->format->BytesPerPixel != 1) {
-        printf("Err: dst BytesPerPixel not equal %d\n", dst->format->BytesPerPixel);
+    // if (src->format->BytesPerPixel != 1) {
+    //     printf("Err: src BytesPerPixel not 1 %d\n", src->format->BytesPerPixel);
+    //     return -1;
+    // }
+    // if (dst->format->BytesPerPixel != 1) {
+    //     printf("Err: dst BytesPerPixel not 1 %d\n", dst->format->BytesPerPixel);
+    //     return -1;
+    // }
+    if (dst->format->BytesPerPixel != dst->format->BytesPerPixel) {
+        printf("Err: src, dst BytesPerPixel not equal %d %d\n", src->format->BytesPerPixel, dst->format->BytesPerPixel); getchar();
         return -1;
     }
 

@@ -315,11 +315,10 @@ void Palette_loaded(T_IO_Context *context)
 void Set_pixel_24b(T_IO_Context *context, short x_pos, short y_pos, byte r, byte g, byte b)
 {
   byte color;
-  
+
   // Clipping
   if (x_pos<0 || y_pos<0 || x_pos>=context->Width || y_pos>=context->Height)
     return;
-        
   switch(context->Type)
   {
     case CONTEXT_MAIN_IMAGE:
@@ -909,7 +908,22 @@ void Load_SDL_Image(T_IO_Context *context)
   {
     // Hi/Trucolor
     Pre_load(context, surface->w, surface->h, file_size ,FORMAT_ALL_IMAGES, PIXEL_SIMPLE, 1);
-    
+
+#if defined(FDOS)
+    // FIXME
+    // Setting 'shift' values is not needed on other platforms, so this should
+    // not be needed. I suspect the issue is due to an imperfect port. 
+    if (surface->format->Rmask & 0xFF) { // Assume BGR format
+        surface->format->Rshift = 0;
+        surface->format->Gshift = 8;
+        surface->format->Bshift = 16;
+    } else if (surface->format->Bmask & 0xFF) { // Assume RGB format
+        surface->format->Rshift = 16;
+        surface->format->Gshift = 8;
+        surface->format->Bshift = 0;
+    }
+#endif
+
     for (y_pos=0; y_pos<context->Height; y_pos++)
     {
       for (x_pos=0; x_pos<context->Width; x_pos++)

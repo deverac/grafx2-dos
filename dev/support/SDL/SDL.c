@@ -7,7 +7,8 @@
 extern Uint32 TICKS_EPOCH;
 
 // Returns 0 on success or -1 on error.
-int SDL_Init(int flags){
+int SDL_Init(Uint32 flags)
+{
   union REGS regs;
   int is_mouse_avail = 0;
 
@@ -47,7 +48,8 @@ int SDL_Init(int flags){
 }
 
 
-void SDL_Quit(void) {
+void SDL_Quit(void)
+{
     union REGS regs;
 
     // Set video (Text mode)

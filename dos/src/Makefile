@@ -57,10 +57,12 @@ SDLLOPT = -lsdl
 
 
 #### Enable SDL_image
+#SDLIMGCOPT = -I../../SDL_image
+#SDLIMGLINC = -L../../SDL_image
+#SDLIMGLOPT = -lsdl_image
 SDLIMGCOPT = -I../../SDL_image
 SDLIMGLINC = -L../../SDL_image
 SDLIMGLOPT = -lsdl_image
-
 
 #### Enable/Disable Joystick support (Joystick is not supported)
 #JOYCOPT = -DUSE_JOYSTICK
@@ -84,14 +86,27 @@ PNGLINC = -L../../libpng12 -L../../zlib
 PNGLOPT = -lpng -lz
 
 
+#### Enable/Disable JPEG support
+JPGCOPT = -I../../libjpg6b
+JPGLINC = -L../../libjpg6b
+JPGLOPT = -ljpeg
+
+
+#### Enable/Disable JPEG support
+TIFCOPT = -I../../libtif36/libtiff
+TIFLINC = -L../../libtif36/libtiff
+TIFLOPT = -ltiff
+
+
 #### Enable/Disable TTF support (True Type Fonts are not supported)
 TTFCOPT = -DNOTTF
 #TTFCOPT =
 
 
-COPT = -W -Wall -Wdeclaration-after-statement -O -g -ggdb -I. $(DOSCOPT) $(JOYCOPT) $(LAYERCOPT) $(LUACOPT) $(PNGCOPT) $(TTFCOPT) $(SDLCOPT) $(SDLIMGCOPT)
+COPT = -W -Wall -Wdeclaration-after-statement -O -g -ggdb -I. $(DOSCOPT) $(JOYCOPT) $(LAYERCOPT) $(LUACOPT) $(JPGCOPT) $(PNGCOPT) $(TIFCOPT) $(TTFCOPT) $(SDLCOPT) $(SDLIMGCOPT)
 
-LOPT = $(SDLLINC) $(LUALINC) $(PNGLINC) $(SDLIMGLINC)  $(SDLLOPT) $(LUALOPT) $(PNGLOPT) $(TTFLOPT) $(SDLIMGLOPT)
+# Order matters for *LOPT.
+LOPT = $(SDLLINC) $(LUALINC) $(JPGLINC) $(PNGLINC) $(TIFLINC) $(SDLIMGLINC)   $(LUALOPT) $(PNGLOPT) $(TTFLOPT) $(SDLIMGLOPT) $(JPGLOPT) $(SDLLOPT) $(TIFLOPT)
 
 
 OBJ = $(OBJDIR)/main.o $(OBJDIR)/init.o $(OBJDIR)/graph.o $(OBJDIR)/sdlscreen.o  $(OBJDIR)/misc.o $(OBJDIR)/special.o $(OBJDIR)/buttons.o $(OBJDIR)/palette.o $(OBJDIR)/help.o $(OBJDIR)/operatio.o $(OBJDIR)/pages.o $(OBJDIR)/loadsave.o $(OBJDIR)/readline.o $(OBJDIR)/engine.o $(OBJDIR)/filesel.o $(OBJDIR)/op_c.o $(OBJDIR)/readini.o $(OBJDIR)/saveini.o $(OBJDIR)/shade.o $(OBJDIR)/keyboard.o $(OBJDIR)/io.o $(OBJDIR)/version.o $(OBJDIR)/text.o $(OBJDIR)/SFont.o $(OBJDIR)/setup.o $(OBJDIR)/pxsimple.o $(OBJDIR)/pxtall.o $(OBJDIR)/pxwide.o $(OBJDIR)/pxdouble.o $(OBJDIR)/pxtriple.o $(OBJDIR)/pxtall2.o $(OBJDIR)/pxwide2.o $(OBJDIR)/pxquad.o $(OBJDIR)/windows.o $(OBJDIR)/brush.o $(OBJDIR)/realpath.o $(OBJDIR)/mountlist.o $(OBJDIR)/input.o $(OBJDIR)/hotkeys.o $(OBJDIR)/transform.o $(OBJDIR)/pversion.o $(OBJDIR)/factory.o $(OBJDIR)/fileformats.o $(OBJDIR)/miscfileformats.o $(OBJDIR)/libraw2crtc.o $(OBJDIR)/brush_ops.o $(OBJDIR)/buttons_effects.o $(OBJDIR)/layers.o $(OBJDIR)/shim.o
