@@ -893,6 +893,12 @@ void Load_SDL_Image(T_IO_Context *context)
     if (surface->format->palette)
     {
       Get_SDL_Palette(surface->format->palette, context->Palette);
+#if defined(FDOS)
+      // FIXME
+      // Setting the palette is not needed on other platforms, so this should
+      // not be needed. I suspect the issue is due to an imperfect port.
+      Set_palette(context->Palette);
+#endif
     }
     
     for (y_pos=0; y_pos<context->Height; y_pos++)
