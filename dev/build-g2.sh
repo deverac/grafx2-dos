@@ -161,44 +161,47 @@ cd g2
     mv ./libpng-1.2.59 ./libpng12
     cp ./libpng12/scripts/makefile.dj2 ./libpng12/Makefile
     sed -i -e 's/rm -f /del /' ./libpng12/Makefile
-    rm -rf ./libpng12/contrib
-    rm -rf ./libpng12/projects
-    rm -rf ./libpng12/scripts
-    rm -f ./libpng12/aclocal.m4
-    rm -f ./libpng12/ag.diff
-    rm -f ./libpng12/ANNOUNCE
-    rm -f ./libpng12/autogen.sh
-    rm -f ./libpng12/CHANGES
-    rm -f ./libpng12/CMakeLists.txt
-    rm -f ./libpng12/compile
-    rm -f ./libpng12/config.guess
-    rm -f ./libpng12/config.h.in
-    rm -f ./libpng12/config.sub
-    rm -f ./libpng12/configure
-    rm -f ./libpng12/configure.ac
-    rm -f ./libpng12/depcomp
-    rm -f ./libpng12/example.c
-    rm -f ./libpng12/INSTALL
-    rm -f ./libpng12/install-sh
-    rm -f ./libpng12/KNOWNBUG
-    rm -f ./libpng12/libpng.3
-    rm -f ./libpng12/libpng-1.2.59.txt
-    rm -f ./libpng12/libpngpf.3
-    rm -f ./libpng12/ltmain.sh
-    rm -f ./libpng12/Makefile.am
-    rm -f ./libpng12/Makefile.in
-    rm -f ./libpng12/missing
-    rm -f ./libpng12/mkinstalldirs
-    rm -f ./libpng12/png.5
-    rm -f ./libpng12/pngbar.jpg
-    rm -f ./libpng12/pngbar.png
-    rm -f ./libpng12/pngnow.png
-    rm -f ./libpng12/pngtest.png
-    rm -f ./libpng12/README
-    rm -f ./libpng12/test-driver
-    rm -f ./libpng12/test-pngtest.sh
-    rm -f ./libpng12/TODO
-    rm -f ./libpng12/Y2KINFO
+    cd ./libpng12
+        rm -rf ./contrib
+        rm -rf ./projects
+        rm -rf ./scripts
+
+        rm -f ./aclocal.m4
+        rm -f ./ag.diff
+        rm -f ./ANNOUNCE
+        rm -f ./autogen.sh
+        rm -f ./CHANGES
+        rm -f ./CMakeLists.txt
+        rm -f ./compile
+        rm -f ./config.guess
+        rm -f ./config.h.in
+        rm -f ./config.sub
+        rm -f ./configure
+        rm -f ./configure.ac
+        rm -f ./depcomp
+        rm -f ./example.c
+        rm -f ./INSTALL
+        rm -f ./install-sh
+        rm -f ./KNOWNBUG
+        rm -f ./libpng.3
+        rm -f ./libpng-1.2.59.txt
+        rm -f ./libpngpf.3
+        rm -f ./ltmain.sh
+        rm -f ./Makefile.am
+        rm -f ./Makefile.in
+        rm -f ./missing
+        rm -f ./mkinstalldirs
+        rm -f ./png.5
+        rm -f ./pngbar.jpg
+        rm -f ./pngbar.png
+        rm -f ./pngnow.png
+        rm -f ./pngtest.png
+        rm -f ./README
+        rm -f ./test-driver
+        rm -f ./test-pngtest.sh
+        rm -f ./TODO
+        rm -f ./Y2KINFO
+    cd ..
 
 
     tar -xzf ../support/tiff-v3.6.1.tar.gz
@@ -250,48 +253,54 @@ cd g2
     mv ./lua-5.1.5 ./lua515
     # Remove comment which prevents successful compilation.
     sed -i -e 's/# DLL needs all object files//' ./lua515/src/Makefile
-    rm -rf ./lua515/doc
-    rm -rf ./lua515/etc
-    rm -rf ./lua515/test
-    rm -f ./lua515/HISTORY
-    rm -f ./lua515/INSTALL
-    rm -f ./lua515/Makefile
-    rm -f ./lua515/README
+    cd ./lua515
+        rm -rf ./doc
+        rm -rf ./etc
+        rm -rf ./test
+
+        rm -f ./HISTORY
+        rm -f ./INSTALL
+        rm -f ./Makefile
+        rm -f ./README
+    cd ..
 
 
     # libpng expects '../zlib' to exist, so extract to a directory of that name.
     tar -xzf ../support/zlib-1.2.11.tar.gz
     mv ./zlib-1.2.11 ./zlib
     cp ./zlib/msdos/Makefile.dj2  ./zlib/Makefile
-    rm -rf ./zlib/amiga
-    rm -rf ./zlib/contrib
-    rm -rf ./zlib/doc
-    rm -rf ./zlib/examples
-    rm -rf ./zlib/msdos
-    rm -rf ./zlib/nintendods
-    rm -rf ./zlib/old
-    rm -rf ./zlib/os400
-    rm -rf ./zlib/qnx
-    rm -rf ./zlib/test
-    rm -rf ./zlib/watcom
-    rm -rf ./zlib/win32
-    rm -f ./zlib/CMakeLists.txt
-    rm -f ./zlib/ChangeLog
-    rm -f ./zlib/FAQ
-    rm -f ./zlib/INDEX
-    rm -f ./zlib/Makefile.in
-    rm -f ./zlib/README
-    rm -f ./zlib/configure
-    rm -f ./zlib/make_vms.com
-    rm -f ./zlib/treebuild.xml
-    rm -f ./zlib/zconf.h.cmakein
-    rm -f ./zlib/zconf.h.in
-    rm -f ./zlib/zlib.3
-    rm -f ./zlib/zlib.3.pdf
-    rm -f ./zlib/zlib.map
-    rm -f ./zlib/zlib.pc.in
-    rm -f ./zlib/zlib.pc.cmakein
-    rm -f ./zlib/zlib2ansi
+    cd ./zlib
+        rm -rf ./amiga
+        rm -rf ./contrib
+        rm -rf ./doc
+        rm -rf ./examples
+        rm -rf ./msdos
+        rm -rf ./nintendods
+        rm -rf ./old
+        rm -rf ./os400
+        rm -rf ./qnx
+        rm -rf ./test
+        rm -rf ./watcom
+        rm -rf ./win32
+
+        rm -f ./CMakeLists.txt
+        rm -f ./ChangeLog
+        rm -f ./FAQ
+        rm -f ./INDEX
+        rm -f ./Makefile.in
+        rm -f ./README
+        rm -f ./configure
+        rm -f ./make_vms.com
+        rm -f ./treebuild.xml
+        rm -f ./zconf.h.cmakein
+        rm -f ./zconf.h.in
+        rm -f ./zlib.3
+        rm -f ./zlib.3.pdf
+        rm -f ./zlib.map
+        rm -f ./zlib.pc.in
+        rm -f ./zlib.pc.cmakein
+        rm -f ./zlib2ansi
+    cd ..
 
  
 
