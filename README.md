@@ -22,12 +22,21 @@ line parameter.
 A key cannot be reassigned to act as both Alt and Ctrl, however multiple
 assignments can be made. (e.g. `/rs-alt /nl-alt /cl-ctrl`)
 
-When using the CapsLock on NumLock keys to simulate a key, their state is
+When using the CapsLock or NumLock keys to simulate a key, their state is
 ignored. It does not matter whether they are toggled on or off; it only matters
 if they are pressed or not pressed. 
 
 Reassigning keys is only needed if you plan to use a keyboard shortcut and the
 keyboard shortcut is one that is not available in DOS.
+
+Grafx2 can only work with a palettized-image. When loading an RGB-image, the
+RGB-image must be converted. The conversion process can take a lot of memory,
+which may cause Grafx2 to hang. The `/pal-prec n` parameter can be used to
+control the amount of memory used. The smallest value (`0`) will use 64 Mb of
+memory. The default value (`1`) will use 1 Mb of memory. The largest value
+(`11`) will use 1 Kb of memory. Generally, the more memory that is used, the
+more accurate the conversion process will be, however, sometimes using less
+memory will actually produce better results.
 
 Grafx2 can run under DOSBox, provided CWSDPMI.EXE is available. There are
 several ways of running CWSDPMI; the easiest is probably just to copy the
@@ -41,7 +50,7 @@ This is an alpha-release. There are probably many bugs.
 `^C` being printed on the screen. This can be cleared by moving the mouse
 over it. This is a difficult issue to fix.
 
-* Mouse emulation via the keyboard (Alt + Up, Down, Left, Right) is not perfect.
+* Mouse emulation via the keyboard (Ctrl + Up, Down, Left, Right) is not perfect.
 Moving Left causes the mouse to move two pixels. If the cursor is on an odd
 x-value, moving Up or Down will also cause the x position to decrease by one.
 
@@ -73,5 +82,5 @@ Grafx2 is compiled with DJGPP on FreeDOS. Ensure DJGPP is on your PATH (e.g.
 
 A package suitable for building on FreeDOS can be created on Linux with the
 `build-g2.sh` script. This script extracts library source files, removes
-unneeded files, applies a patch to the original Grafx2 sources, and then
+unneeded files and then
 creates `g2.zip` containing all the modified source files.
